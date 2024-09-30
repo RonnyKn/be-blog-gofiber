@@ -1,6 +1,8 @@
 package controller
 
 import (
+	"log"
+
 	"github.com/RonnyKn/be-blog-gofiber/db"
 	"github.com/RonnyKn/be-blog-gofiber/models"
 
@@ -25,12 +27,29 @@ func BlogList(c *fiber.Ctx) error {
 }
 
 func BlogCreate(c *fiber.Ctx) error {
-	context := fiber.Map{
-		"statusText": "OK",
-		"message":    "Blog Created",
+	context := fiber.Map{}
+
+	data := new(models.Blog)
+	if err := c.BodyParser(&data); 
+	 err != nil {
+		log.Println("Error in parsing request", err)
+		context["message"] = err
 	}
 
-	c.Status(201)
+  	result := db.DBConn.Create(&data)
+
+	// if data.BlogID == 0 {
+	// 	log.Println("Error in creating blog", result.Error)
+	// 	context["message"] = result.Error
+	// }
+
+  	if result.Error != nil {
+		log.Println("Error in creating blog", result.Error)
+		context["message"] = result.Error
+	}
+	context["data"] = data
+	context["message"] = "Blog Created"
+	c.Status(200)
 	return c.JSON(context)
 }
 
