@@ -38,11 +38,6 @@ func BlogCreate(c *fiber.Ctx) error {
 
   	result := db.DBConn.Create(&data)
 
-	// if data.BlogID == 0 {
-	// 	log.Println("Error in creating blog", result.Error)
-	// 	context["message"] = result.Error
-	// }
-
   	if result.Error != nil {
 		log.Println("Error in creating blog", result.Error)
 		context["message"] = result.Error
@@ -59,7 +54,34 @@ func BlogUpdate(c *fiber.Ctx) error {
 		"message":    "Blog UPDATED",
 	}
 
+	id := c.Params("id")
+	
+	db := db.DBConn
+	var blog models.Blog
+	data := db.First(&blog, id)
+
+	if blog.BlogID == 0 {
+		log.Println("Blog Not Found")
+		context["message"] = "Blog "+id+" Not Found"
+		c.Status(404)
+		return c.JSON(context)
+	}
+
+	if data.Error != nil {
+		log.Println("Error in updating blog", data.Error)
+		context["message"] = data.Error
+	}
+
+	if err := c.BodyParser(&blog); err != nil {
+		log.Println("Error in parsing request", err)
+	}
+	result := db.Save(&blog)
+
+	if result.Error != nil {
+		log.Println("Error in updating blog", result.Error)
+		context["message"] = result.Error}
 	c.Status(200)
+	context["data"] = blog
 	return c.JSON(context)
 }
 
@@ -69,6 +91,29 @@ func BlogDelete(c *fiber.Ctx) error {
 		"message":    "Blog Deleted",
 	}
 
-	c.Status(200)
-	return c.JSON(context)
-}
+	id := c.Params("id")
+	db := db.DBConn
+	var blog models.Blog
+	data := db.First(&blog, id)
+
+	if blog.BlogID == 0{
+		log.Println("Blog "+id+" Not Found")
+		context["message"] = "Blog "+id+" Not Found"
+		c.Status(404)
+		return c.JSON(context)	
+	}
+	if data.Error != nil{
+		log.Println("Error in deleting blog", data.Error)
+		context["message"] = data.Error
+	}	
+
+	result := db.Delete(&blog, id)
+	if result.Error != nil{
+		log.Println("Error in deleting blog", result.Error)
+		context["message"] = result.Error
+	} 
+		context["data"] = blog
+		context["message"] = "Blog "+id+" Deleted"
+		c.Status(200)
+		return c.JSON(context)
+	}
