@@ -7,6 +7,7 @@ import (
 	"github.com/RonnyKn/be-blog-gofiber/router"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/joho/godotenv"
 )
@@ -36,11 +37,14 @@ func main() {
 	// Middlewares logger
 	app.Use(logger.New())
 
+	// CORS
+	app.Use(cors.New())
+
 	// Routes
 	router.SetupRouter(app)
 
 	// Listen and Server in :4000
 	app.Listen(":4000")
 
-
+	
 }
