@@ -23,6 +23,7 @@ func init() {
 
 func main() {
 
+	// Get DB connection
 	sqlDB, err := db.DBConn.DB()
 	if err != nil {
 		panic(err)}
