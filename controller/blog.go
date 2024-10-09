@@ -48,6 +48,29 @@ func BlogCreate(c *fiber.Ctx) error {
 	return c.JSON(context)
 }
 
+func BlogDetail(c *fiber.Ctx) error {
+	context := fiber.Map{
+		"statusText": "",
+		"message":    "",
+	}
+
+	id := c.Params("id")
+	var blog models.Blog
+	
+	db.DBConn.First(&blog, id)
+
+	if blog.BlogID == 0 {
+		log.Println("Error, Blog " + id + " Not Found")
+		context["message"] = "Blog " + id + " Not Found"
+		c.Status(404)
+		return c.JSON(context)
+	}
+	c.Status(200)
+	context["status Text"] = "OK"
+	context["message"] = "Blog Details"
+	context["data"] = blog
+	return c.JSON(context)
+}
 func BlogUpdate(c *fiber.Ctx) error {
 	context := fiber.Map{
 		"statusText": "OK",
