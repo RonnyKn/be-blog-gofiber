@@ -49,6 +49,7 @@ func BlogCreate(c *fiber.Ctx) error {
 }
 
 func BlogDetail(c *fiber.Ctx) error {
+	c.Status(400)
 	context := fiber.Map{
 		"statusText": "",
 		"message":    "",
